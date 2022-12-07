@@ -26,6 +26,7 @@ namespace CalorieTracker5000
             myDataBase = DependencyService.Get<IDatabase>().DBConnect();
             myDataBase.CreateTable<FoodData_Model>();
             myDataBase.CreateTable<UserInfo_Model>();
+            myDataBase.CreateTable<Exercise_Model>();
             //myDataBase.CreateTable<FoodData_Model>();
 
             //=============
@@ -77,7 +78,7 @@ namespace CalorieTracker5000
             //These labels need to be constatntly updated
             Label calsProgLbl = new Label
             {
-                Text = todaysCals + "/" + userName.goalCalories.ToString(),
+                Text = "Calories Consumed: " + todaysCals + "/" + userName.goalCalories.ToString(),
                 //Text = test.Calories.ToString(),
                 TextColor = Color.White,
                 FontSize = 16,
@@ -108,7 +109,7 @@ namespace CalorieTracker5000
 
             Label LunchLbl = new Label
             {
-                Text = "Calories: " + DataBaseControls.GetBreakFastCals(myDataBase, TodaysDate),
+                Text = "Calories: " + DataBaseControls.GetLunchCals(myDataBase, TodaysDate),
                 TextColor = Color.White,
                 FontSize = 18,
                 HorizontalOptions = LayoutOptions.Start,
@@ -116,7 +117,7 @@ namespace CalorieTracker5000
 
             Label DinnerLbl = new Label
             {
-                Text = "Calories: " + DataBaseControls.GetBreakFastCals(myDataBase, TodaysDate),
+                Text = "Calories: " + DataBaseControls.GetDinnerCals(myDataBase, TodaysDate),
                 TextColor = Color.White,
                 FontSize = 18,
                 HorizontalOptions = LayoutOptions.Start,
@@ -124,7 +125,7 @@ namespace CalorieTracker5000
 
             Label SnackLbl = new Label
             {
-                Text = "Calories: " + DataBaseControls.GetBreakFastCals(myDataBase, TodaysDate),
+                Text = "Calories: " + DataBaseControls.GetSnackCals(myDataBase, TodaysDate),
                 TextColor = Color.White,
                 FontSize = 18,
                 HorizontalOptions = LayoutOptions.Start,
@@ -135,15 +136,20 @@ namespace CalorieTracker5000
             {
                 ProgressColor = Color.FromRgb(254, 205, 170)
             };
-            //These labels need to be constantly updated
+            double p = Convert.ToDouble(todaysCals) / Convert.ToDouble(userName.goalCalories);
+            calsProgress.ProgressTo(p, 500, Easing.Linear);
 
+            //These labels need to be constantly updated
+            
             datePicker.DateSelected += async (args, e) =>
             {
                 
                 TodaysDate = datePicker.Date.Month.ToString() + "/" + datePicker.Date.Day.ToString() + "/" + datePicker.Date.Year.ToString();
                 todaysCals = DataBaseControls.GetTodaysCals(myDataBase, TodaysDate);
                 DataBaseControls.GenDayStatingCals(myDataBase, TodaysDate);
-                
+                p = todaysCals / userName.goalCalories;
+                Math.Round(p, 2);
+                await calsProgress.ProgressTo(p, 500, Easing.Linear);
                 ReFreshData();
             };
 
@@ -156,7 +162,7 @@ namespace CalorieTracker5000
 
             Cookbook.Clicked += async (args, e) =>
             {
-                await Navigation.PushAsync(new Cookbook());
+                await Navigation.PushAsync(new Cookbook(myDataBase, TodaysDate));
             };
 
             this.ToolbarItems.Add(Settings);
@@ -230,7 +236,7 @@ namespace CalorieTracker5000
                         new Label
                         {
                             Text =    
-                            "\nWeightGoal: " + userName.WeightGoal +
+                            "\nWeightGoal: " + userName.WeightGoal + 
                             "\nCurrentWeight: " + userName.CurrentWeight +
                             "\nProtein Goal: " + userName.goalProtein +
                             "\nCarb Goal: " + userName.goalCarbs +
@@ -341,6 +347,7 @@ namespace CalorieTracker5000
                             HeightRequest = 2
 
                         },
+                        LunchLbl
                     }
                 }
             };
@@ -380,6 +387,7 @@ namespace CalorieTracker5000
                             HeightRequest = 2
 
                         },
+                        DinnerLbl,
                     }
                 }
             };
@@ -419,6 +427,7 @@ namespace CalorieTracker5000
                             HeightRequest = 2
 
                         },
+                        SnackLbl,
                     }
                 }
             };
@@ -466,7 +475,7 @@ namespace CalorieTracker5000
             var ExerciseTapRecognizer = new TapGestureRecognizer();
             ExerciseTapRecognizer.Tapped += async (sender, e) =>
             {
-                await Navigation.PushAsync(new TrackExercise());
+                await Navigation.PushAsync(new TrackExercise(myDataBase, TodaysDate));
             };
 
             Exercise.GestureRecognizers.Add(ExerciseTapRecognizer);
@@ -501,10 +510,13 @@ namespace CalorieTracker5000
                 calsProgLbl.Text = todaysCals.ToString() + "/" + userName.goalCalories.ToString();
                 // Refresh the data label 
                 DateLabel.Text = datePicker.Date.Month.ToString() + "/" + datePicker.Date.Day.ToString() + "/" + datePicker.Date.Year.ToString();
-               BreakfastLbl.Text = "Breakfast Cals: " + DataBaseControls.GetBreakFastCals(myDataBase, TodaysDate);
-
-                int p = todaysCals / userName.goalCalories;
-                calsProgress.ProgressTo(p, 2000, Easing.Linear);
+                BreakfastLbl.Text = "Breakfast Cals: " + DataBaseControls.GetBreakFastCals(myDataBase, TodaysDate);
+                LunchLbl.Text = "Lunch Cals: " + DataBaseControls.GetLunchCals(myDataBase, TodaysDate);
+                DinnerLbl.Text = "Dinner Cals: " + DataBaseControls.GetDinnerCals(myDataBase, TodaysDate);
+                SnackLbl.Text = "Snack Cals: " + DataBaseControls.GetSnackCals(myDataBase, TodaysDate);
+                //
+                double pp = Convert.ToDouble(todaysCals) / Convert.ToDouble(userName.goalCalories);
+                calsProgress.ProgressTo(pp, 500, Easing.Linear);
 
             }
         }

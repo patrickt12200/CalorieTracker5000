@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CalorieTracker5000.Database
 {
-     class Exercise_Model
+     public class Exercise_Model
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }

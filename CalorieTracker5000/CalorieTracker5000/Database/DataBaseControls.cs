@@ -13,6 +13,7 @@ using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
 using SQLite;
 using CalorieTracker5000.Database;
 using System.Security.Cryptography.X509Certificates;
+using System.Collections.ObjectModel;
 
 namespace CalorieTracker5000.Database
 {
@@ -40,6 +41,31 @@ namespace CalorieTracker5000.Database
 
         }
 
+        public static void AddExercise(SQLiteConnection db, string TodaysDate, string Exercise, int Mins)
+        {
+            var exercise = new Exercise_Model
+            {
+                ExerciseName = Exercise,
+                ExerciseTime = Mins,
+                Date = TodaysDate
+            };
+
+            db.Insert(exercise);
+        }
+
+        public static ObservableCollection<FoodData_Model> GetTodaysFoods(SQLiteConnection db, string TodaysDate)
+        {
+            ObservableCollection<FoodData_Model> foodData = new ObservableCollection<FoodData_Model>();
+            var foods = new List<FoodData_Model>();
+
+            var todaysFoods = from i in db.Table<FoodData_Model>()
+                              where i.Date == TodaysDate
+                              select i;
+                            
+            foreach(FoodData_Model i in todaysFoods) { foods.Add(i);}
+            return foodData;
+            
+        }
         public static int GetTodaysCals(SQLiteConnection db, string TodaysDate)
         {
           //  MainPage main = new MainPage();

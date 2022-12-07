@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CalorieTracker5000.Database;
+using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +11,7 @@ namespace CalorieTracker5000.Views
 {
     public class TrackExercise : ContentPage
     {
-        public TrackExercise()
+        public TrackExercise(SQLiteConnection db, string TodaysDate)
         {
             Grid PrimaryGrid = new Grid
             {
@@ -38,6 +40,10 @@ namespace CalorieTracker5000.Views
                 TextColor = Color.White,
                 BackgroundColor = Color.FromRgb(254, 205, 170),
                 Margin = new Thickness(0, 10, 0, 10),
+            };
+            addExercise.Clicked += (args, e) =>
+            {
+                DataBaseControls.AddExercise(db, TodaysDate, ExerciseName.Text, Convert.ToInt32(WorkoutDuration));
             };
 
             Content = new StackLayout
