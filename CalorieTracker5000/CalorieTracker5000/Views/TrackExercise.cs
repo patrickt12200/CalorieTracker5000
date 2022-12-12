@@ -41,9 +41,12 @@ namespace CalorieTracker5000.Views
                 BackgroundColor = Color.FromRgb(254, 205, 170),
                 Margin = new Thickness(0, 10, 0, 10),
             };
-            addExercise.Clicked += (args, e) =>
+             addExercise.Clicked += (args, e) =>
             {
-                DataBaseControls.AddExercise(db, TodaysDate, ExerciseName.Text, Convert.ToInt32(WorkoutDuration));
+                int mins = Convert.ToInt32(WorkoutDuration.Text);
+                string exercise = ExerciseName.Text;
+                DataBaseControls.AddExercise(db, TodaysDate, exercise , mins);
+                DisplayAlert("Success!", ExerciseName.Text + " has been added to the database!", "OK");
             };
 
             Content = new StackLayout

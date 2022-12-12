@@ -131,6 +131,14 @@ namespace CalorieTracker5000
                 HorizontalOptions = LayoutOptions.Start,
             };
 
+            Label ExerciseLbl = new Label
+            {
+                Text = "Mins: " + DataBaseControls.GetTodaysExercise(myDataBase, TodaysDate),
+                TextColor = Color.White,
+                FontSize = 18,
+                HorizontalOptions = LayoutOptions.Start,
+            }
+            ;
 
             ProgressBar calsProgress = new ProgressBar
             {
@@ -139,8 +147,15 @@ namespace CalorieTracker5000
             double p = Convert.ToDouble(todaysCals) / Convert.ToDouble(userName.goalCalories);
             calsProgress.ProgressTo(p, 500, Easing.Linear);
 
+            ProgressBar exerciseProgress = new ProgressBar
+            {
+                ProgressColor = Color.FromRgb(254, 205, 170)
+            };
+            int exTime = DataBaseControls.GetTodaysExercise(myDataBase, TodaysDate);
+            double exP = Convert.ToDouble(exTime) / 60;
+            exerciseProgress.ProgressTo(exP, 500, Easing.Linear);
             //These labels need to be constantly updated
-            
+
             datePicker.DateSelected += async (args, e) =>
             {
                 
@@ -208,6 +223,39 @@ namespace CalorieTracker5000
             };
             var test = myDataBase.Get<FoodData_Model>(1);
 
+            Grid sumGrid = new Grid
+            {
+                ColumnDefinitions = {
+                    new ColumnDefinition(),
+                    new ColumnDefinition(),
+                    new ColumnDefinition(),
+                    new ColumnDefinition() },
+                RowDefinitions =
+                {
+                    new RowDefinition(),
+                    new RowDefinition(),
+                    new RowDefinition()
+                },
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions= LayoutOptions.Center,
+            };
+            int todaysProtein = DataBaseControls.GetTodaysProtein(myDataBase, TodaysDate);
+            int todaysCarbs = DataBaseControls.GetTodaysCarbs(myDataBase, TodaysDate);
+            int todaysFats = DataBaseControls.GetTodaysFats(myDataBase, TodaysDate);
+            sumGrid.Children.Add(new Label { Text = "Cals", HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 0, 0);
+            sumGrid.Children.Add(new Label { Text = "Protein", HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 1, 0);
+            sumGrid.Children.Add(new Label { Text = "Carbs", HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 2, 0);
+            sumGrid.Children.Add(new Label { Text = "Fats", HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 3, 0);
+            sumGrid.Children.Add(new Label { Text = userName.goalCalories.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 0, 1);
+            sumGrid.Children.Add(new Label { Text = userName.goalProtein.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 1, 1);
+            sumGrid.Children.Add(new Label { Text = userName.goalCarbs.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 2, 1);
+            sumGrid.Children.Add(new Label { Text = userName.goalFats.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 3, 1);
+            sumGrid.Children.Add(new Label { Text = todaysCals.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 0, 2);
+            sumGrid.Children.Add(new Label { Text = todaysProtein.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 1, 2);
+            sumGrid.Children.Add(new Label { Text = todaysCarbs.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 2, 2);
+            sumGrid.Children.Add(new Label { Text = todaysFats.ToString(), HorizontalOptions = LayoutOptions.Center, TextColor = Color.White }, 3, 2);
+
+
             Frame WelcomeFrame = new Frame
             {
                 Content = new StackLayout
@@ -225,7 +273,15 @@ namespace CalorieTracker5000
                         DateLabel,
                         calsProgLbl,
                         calsProgress,
-                        
+
+                        new BoxView
+                        {
+                            Color = Color.FromRgb(148, 131, 146),
+                            HorizontalOptions = LayoutOptions.FillAndExpand,
+                            HeightRequest = 2
+
+                        },
+                        sumGrid,
                         new BoxView
                         {
                             Color = Color.FromRgb(148, 131, 146),
@@ -235,26 +291,36 @@ namespace CalorieTracker5000
                         },
                         new Label
                         {
-                            Text =    
-                            "\nWeightGoal: " + userName.WeightGoal + 
-                            "\nCurrentWeight: " + userName.CurrentWeight +
-                            "\nProtein Goal: " + userName.goalProtein +
-                            "\nCarb Goal: " + userName.goalCarbs +
-                            "\nFats Goal : " + userName.goalFats,
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center,
+                            Text = "Mins Exercised: " + DataBaseControls.GetTodaysExercise(
+                                myDataBase, TodaysDate) + "/60",
+                            TextColor = Color.White
+                        },
+                        exerciseProgress,
+                        //new Label
+                        //{
+                        //    Text =    
+                        //    "\nWeightGoal: " + userName.WeightGoal + 
+                        //    "\nCurrentWeight: " + userName.CurrentWeight +
+                        //    "\nProtein Goal: " + userName.goalProtein +
+                        //    "\nCarb Goal: " + userName.goalCarbs +
+                        //    "\nFats Goal : " + userName.goalFats,
 
 
-                            HorizontalOptions = LayoutOptions.CenterAndExpand,
-                            TextColor = Color.White,
-                            FontSize = 16,
-                        }
-                    }
-                }, 
+                        //    HorizontalOptions = LayoutOptions.CenterAndExpand,
+                        //    TextColor = Color.White,
+                        //    FontSize = 16,
+                        //}
+                    },
+                    
+           
+                },
                 Margin = new Thickness(10),
                 BackgroundColor = Color.FromRgb(155, 193, 188),
                 HasShadow = true,
                 HeightRequest = 300,
-                BorderColor = Color.FromRgb(92, 164, 169),            
-                
+                BorderColor = Color.FromRgb(92, 164, 169),
             };
 
                 //=============
@@ -446,7 +512,7 @@ namespace CalorieTracker5000
             Frame Exercise = new Frame
             {
                 Margin = new Thickness(10),
-                HeightRequest = 45,
+                HeightRequest = 55,
                 BackgroundColor = Color.FromRgb(155, 193, 188),
                 HasShadow = true,
                 Content = new StackLayout
@@ -467,6 +533,7 @@ namespace CalorieTracker5000
                             HeightRequest = 2
 
                         },
+                        ExerciseLbl,
                     }
                 }
 
@@ -517,6 +584,10 @@ namespace CalorieTracker5000
                 //
                 double pp = Convert.ToDouble(todaysCals) / Convert.ToDouble(userName.goalCalories);
                 calsProgress.ProgressTo(pp, 500, Easing.Linear);
+
+                int exTimes = DataBaseControls.GetTodaysExercise(myDataBase, TodaysDate);
+                double exPs = Convert.ToDouble(exTimes) / 60;
+                exerciseProgress.ProgressTo(exPs, 500, Easing.Linear);
 
             }
         }

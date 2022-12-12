@@ -26,8 +26,13 @@ namespace CalorieTracker5000.Database
             
         }
 
-        public static void RemoveFood(SQLiteConnection db, FoodData_Model var)
+        public static void RemoveFood(SQLiteConnection db, string food, string date)
         {
+            FoodData_Model foodData = new FoodData_Model();
+            var delFood = from i in db.Table<FoodData_Model>()
+                           where i.FoodName == food && i.Date == date
+                           select i;
+            foreach(var i in delFood) { db.Delete(i); }
 
         }
 
@@ -41,7 +46,7 @@ namespace CalorieTracker5000.Database
 
         }
 
-        public static void AddExercise(SQLiteConnection db, string TodaysDate, string Exercise, int Mins)
+        public static async void AddExercise(SQLiteConnection db, string TodaysDate, string Exercise, int Mins)
         {
             var exercise = new Exercise_Model
             {
@@ -49,8 +54,18 @@ namespace CalorieTracker5000.Database
                 ExerciseTime = Mins,
                 Date = TodaysDate
             };
-
             db.Insert(exercise);
+
+        }
+
+        public static int GetTodaysExercise(SQLiteConnection db, string TodaysDate)
+        {
+            int totalExercise = 0;
+            var exercise = from i in db.Table<Exercise_Model>()
+                           where i.Date == TodaysDate
+                           select i.ExerciseTime;
+            foreach(int i in exercise) { totalExercise += i; }
+            return totalExercise;
         }
 
         public static ObservableCollection<FoodData_Model> GetTodaysFoods(SQLiteConnection db, string TodaysDate)
@@ -76,6 +91,37 @@ namespace CalorieTracker5000.Database
 
             foreach (int i in testcal) { totalcals += i; }
             return totalcals;
+        }
+        public static int GetTodaysProtein(SQLiteConnection db, string TodaysDate)
+        {
+            int totalPro = 0;
+            var pro = from i in db.Table<FoodData_Model>()
+                          where i.Date == TodaysDate
+                          select i.Proteins;
+
+            foreach (int i in pro) { totalPro += i; }
+            return totalPro;
+        }
+        public static int GetTodaysFats(SQLiteConnection db, string TodaysDate)
+        {
+            int totalPro = 0;
+            var pro = from i in db.Table<FoodData_Model>()
+                      where i.Date == TodaysDate
+                      select i.Fats;
+
+            foreach (int i in pro) { totalPro += i; }
+            return totalPro;
+        }
+
+        public static int GetTodaysCarbs(SQLiteConnection db, string TodaysDate)
+        {
+            int totalPro = 0;
+            var pro = from i in db.Table<FoodData_Model>()
+                      where i.Date == TodaysDate
+                      select i.Carbs;
+
+            foreach (int i in pro) { totalPro += i; }
+            return totalPro;
         }
 
         public static int GetBreakFastCals(SQLiteConnection db, string TodaysDate)

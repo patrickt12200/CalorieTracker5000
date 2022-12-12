@@ -137,6 +137,7 @@ namespace CalorieTracker5000.Views
                 db.Insert(foodInfo);
                 await DisplayAlert("Success!", inputMeal + " has been added to the database!", "OK");
                 await Navigation.PushAsync(new MainPage());
+                await Navigation.PopToRootAsync();
             };
 
             Content = new StackLayout
